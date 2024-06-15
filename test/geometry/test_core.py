@@ -1,6 +1,6 @@
 import pytest
 
-from supervision.geometry.core import Point, Vector
+from supervision.geometry.core import Point, Vec4, Vector
 
 
 @pytest.mark.parametrize(
@@ -57,3 +57,70 @@ def test_vector_cross_product(
 def test_vector_magnitude(vector: Vector, expected_result: float) -> None:
     result = vector.magnitude
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "vec, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), -2),
+        (Vec4(t=1, x=1, y=1, z=0), -1),
+        (Vec4(t=1, x=0, y=1, z=0), -0),
+        (Vec4(t=2, x=0, y=1, z=0), 3),
+    ],
+)
+def test_four_vector_magnitude(vec: Vec4, expected_result: float) -> None:
+    assert vec.minkowski == expected_result
+
+
+@pytest.mark.parametrize(
+    "vec, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), False),
+        (Vec4(t=1, x=1, y=1, z=0), False),
+        (Vec4(t=1, x=0, y=1, z=0), False),
+        (Vec4(t=2, x=0, y=1, z=0), True),
+    ],
+)
+def test_four_vector_timelike(vec: Vec4, expected_result: bool) -> None:
+    assert vec.timelike == expected_result
+
+
+@pytest.mark.parametrize(
+    "vec, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), True),
+        (Vec4(t=1, x=1, y=1, z=0), True),
+        (Vec4(t=1, x=0, y=1, z=0), False),
+        (Vec4(t=2, x=0, y=1, z=0), False),
+    ],
+)
+def test_four_vector_spacelike(vec: Vec4, expected_result: bool) -> None:
+    assert vec.spacelike == expected_result
+
+
+@pytest.mark.parametrize(
+    "vec, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), False),
+        (Vec4(t=2, x=2, y=0, z=0), True),
+        (Vec4(t=1, x=0, y=1, z=0), True),
+        (Vec4(t=2, x=0, y=1, z=0), False),
+    ],
+)
+def test_four_vector_lightlike(vec: Vec4, expected_result: bool) -> None:
+    assert vec.lightlike == expected_result
+
+
+@pytest.mark.parametrize(
+    "lhs, rhs, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), Vec4(t=0, x=1, y=1, z=0), -2),
+        (Vec4(t=1, x=1, y=1, z=0), Vec4(t=0, x=1, y=1, z=0), -2),
+        (Vec4(t=2, x=1, y=1, z=0), Vec4(t=1, x=1, y=1, z=0), 0),
+        (Vec4(t=2, x=1, y=1, z=1), Vec4(t=2, x=1, y=1, z=0), 2),
+    ],
+)
+def test_four_vector_multiplication(
+    lhs: Vec4, rhs: Vec4, expected_result: float
+) -> None:
+    return lhs * rhs == expected_result

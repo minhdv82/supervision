@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from math import sqrt
-from typing import Tuple
+from typing import Tuple, Union
 
 
 class Position(Enum):
@@ -135,14 +135,21 @@ class Vec4:
     y: float
     z: float
 
-    def dot(self, other: Vec4) -> float:
+    def _dot(self, other: Vec4) -> float:
         return (self.t * other.t) - (
             self.x * other.x + self.y * other.y + self.z * other.z
         )
 
     @property
     def minkowski(self) -> float:
-        return self.dot(self)
+        """
+        Calculate the Minkowskian magnitude of the vector.
+        The metric signature is assumed to be (+, -, -, -)
+
+        Returns:
+            float: The Minkowskian magnitude of the vector.
+        """
+        return self._dot(self)
 
     @property
     def timelike(self) -> bool:
@@ -154,7 +161,25 @@ class Vec4:
 
     @property
     def lightlike(self) -> bool:
-        return not (self.spacelike and self.timelike)
+        return not (self.spacelike or self.timelike)
 
-    def scalar_mul(self, a: float) -> Vec4:
+    def __add__(self, other) -> Vec4:
+        other = Vec4(other) if isinstance(other, float) else other
+        return Vec4(
+            self.t + other.t, self.x + other.x, self.y + other.y, self.z + other.z
+        )
+
+    def __sub__(self, other) -> Vec4:
+        other = Vec4(other) if isinstance(other, float) else other
+        return Vec4(
+            self.t - other.t, self.x - other.x, self.y - other.y, self.z - other.z
+        )
+
+    def _scalar_mul(self, a: float) -> Vec4:
         return Vec4(self.t * a, self.x * a, self.y * a, self.z * a)
+
+    def __mul__(self, other) -> Union[Vec4, float]:
+        if isinstance(other, float):
+            return self._scalar_mul(other)
+        else:
+            return self._dot(other)
