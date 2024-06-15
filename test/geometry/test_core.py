@@ -123,4 +123,30 @@ def test_four_vector_lightlike(vec: Vec4, expected_result: bool) -> None:
 def test_four_vector_multiplication(
     lhs: Vec4, rhs: Vec4, expected_result: float
 ) -> None:
-    return lhs * rhs == expected_result
+    assert lhs * rhs == expected_result
+
+
+@pytest.mark.parametrize(
+    "lhs, rhs, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), Vec4(t=0, x=1, y=1, z=0), Vec4(t=0, x=2, y=2, z=0)),
+        (Vec4(t=1, x=1, y=1, z=0), Vec4(t=0, x=1, y=1, z=0), Vec4(t=1, x=2, y=2, z=0)),
+        (Vec4(t=2, x=1, y=1, z=0), Vec4(t=1, x=1, y=1, z=0), Vec4(t=3, x=2, y=2, z=0)),
+        (Vec4(t=2, x=1, y=1, z=1), Vec4(t=2, x=1, y=1, z=0), Vec4(t=4, x=2, y=2, z=1)),
+    ],
+)
+def test_four_vector_addition(lhs: Vec4, rhs: Vec4, expected_result: float) -> None:
+    assert lhs + rhs == expected_result
+
+
+@pytest.mark.parametrize(
+    "lhs, rhs, expected_result",
+    [
+        (Vec4(t=0, x=1, y=1, z=0), Vec4(t=0, x=1, y=1, z=0), Vec4(t=0, x=0, y=0, z=0)),
+        (Vec4(t=1, x=1, y=1, z=0), Vec4(t=0, x=1, y=1, z=0), Vec4(t=1, x=0, y=0, z=0)),
+        (Vec4(t=2, x=1, y=1, z=0), Vec4(t=1, x=1, y=1, z=0), Vec4(t=1, x=0, y=0, z=0)),
+        (Vec4(t=2, x=1, y=1, z=1), Vec4(t=2, x=1, y=1, z=0), Vec4(t=0, x=0, y=0, z=1)),
+    ],
+)
+def test_four_vector_subtraction(lhs: Vec4, rhs: Vec4, expected_result: float) -> None:
+    assert lhs - rhs == expected_result
