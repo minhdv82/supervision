@@ -126,3 +126,35 @@ class Rect:
             int(self.x + self.width),
             int(self.y + self.height),
         )
+
+
+@dataclass
+class Vec4:
+    t: float
+    x: float
+    y: float
+    z: float
+
+    def dot(self, other: Vec4) -> float:
+        return (self.t * other.t) - (
+            self.x * other.x + self.y * other.y + self.z * other.z
+        )
+
+    @property
+    def minkowski(self) -> float:
+        return self.dot(self)
+
+    @property
+    def timelike(self) -> bool:
+        return self.minkowski > 1e-12
+
+    @property
+    def spacelike(self) -> bool:
+        return self.minkowski < -1e-12
+
+    @property
+    def lightlike(self) -> bool:
+        return not (self.spacelike and self.timelike)
+
+    def scalar_mul(self, a: float) -> Vec4:
+        return Vec4(self.t * a, self.x * a, self.y * a, self.z * a)
